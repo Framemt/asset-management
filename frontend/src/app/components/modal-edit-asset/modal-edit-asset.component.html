@@ -1,0 +1,150 @@
+@if (isOpen && editForm) {
+  <div class="modal-backdrop-custom" (click)="close()">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header bg-dark text-white p-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-pencil-square fs-5"></i>
+          <div>
+            <h5 class="modal-title fs-6 fw-bold mb-0">แก้ไขข้อมูลครุภัณฑ์</h5>
+            <small class="text-white-50" style="font-size: 0.7rem;">แก้ไขรายละเอียดทั้งหมดในกรณีใส่ข้อมูลผิดพลาด</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="close()"></button>
+      </div>
+
+      <!-- Scrollable Form Body -->
+      <div class="modal-scrollable-body">
+        
+        <!-- Image Upload & Preview -->
+        <div class="card bg-light border p-3 mb-3 rounded-3 shadow-sm">
+          <label class="form-label fw-bold text-dark d-flex align-items-center gap-1 mb-2" style="font-size: 0.78rem;">
+            <i class="bi bi-camera-fill text-primary"></i>
+            <span>รูปภาพครุภัณฑ์</span>
+          </label>
+          <div class="d-flex align-items-center gap-3">
+            <img [src]="editForm.image" (error)="onImageError($event)" alt="Preview" class="rounded-3 border object-fit-cover bg-white shadow-sm" style="width: 75px; height: 75px;" />
+            <div class="flex-grow-1">
+              <input #editFileInput type="file" accept="image/*" (change)="onFileSelected($event)" class="d-none" />
+              <button type="button" class="btn btn-outline-primary btn-sm fw-bold rounded-pill px-3 mb-2 d-flex align-items-center gap-1 shadow-sm" (click)="editFileInput.click()" [disabled]="isUploading">
+                @if (isUploading) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                  <span>กำลังอัปโหลด...</span>
+                } @else {
+                  <i class="bi bi-cloud-arrow-up-fill fs-6"></i>
+                  <span>อัปโหลดรูปภาพใหม่จากเครื่อง</span>
+                }
+              </button>
+              <input type="text" [(ngModel)]="editForm.image" class="form-control form-control-sm" placeholder="หรือกรอก URL รูปภาพ เช่น https://..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Name, Brand, Model -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.75rem;">รายการครุภัณฑ์ (ชื่อ) <span class="text-danger">*</span></label>
+          <input type="text" [(ngModel)]="editForm.name" class="form-control form-control-sm" placeholder="เช่น คอมพิวเตอร์ตั้งโต๊ะ All-in-One" />
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-5">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ยี่ห้อ (Brand) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="editForm.brand" class="form-control form-control-sm" placeholder="เช่น Dell, HP" />
+          </div>
+          <div class="col-md-7">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">รุ่น (Model) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="editForm.model" class="form-control form-control-sm" placeholder="เช่น OptiPlex 7410" />
+          </div>
+        </div>
+
+        <!-- Numbers: Asset Number, Serial Number -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">เลขครุภัณฑ์ (Asset Number)</label>
+            <input type="text" [(ngModel)]="editForm.assetNumber" class="form-control form-control-sm font-monospace" placeholder="เช่น พณ.6601-001-0021/67" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">Serial Number (ห้ามซ้ำ) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="editForm.serialNumber" class="form-control form-control-sm font-monospace fw-bold" />
+          </div>
+        </div>
+
+        <!-- User & Department -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ผู้ใช้งาน (ชื่อบุคลากร)</label>
+            <input type="text" [(ngModel)]="editForm.assignedPersonnelName" class="form-control form-control-sm mb-1" placeholder="พิมพ์ชื่อผู้ใช้งาน" />
+            <select (change)="onSelectPersonnel($event)" class="form-select form-select-sm text-muted" style="font-size: 0.7rem;">
+              <option value="">-- หรือเลือกจากรายชื่อบุคลากร --</option>
+              @for (p of activePersonnelList; track p.id) {
+                <option [value]="p.id">{{ p.name }} ({{ p.department }} - ห้อง {{ p.room }})</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ฝ่าย / สังกัด <span class="text-danger">*</span></label>
+            <select [(ngModel)]="editForm.department" class="form-select form-select-sm">
+              @for (dept of departmentList; track dept) {
+                <option [value]="dept">{{ dept }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Location & Room -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">สถานที่ (Location)</label>
+            <input type="text" [(ngModel)]="editForm.location" class="form-control form-control-sm" placeholder="เช่น อาคาร 1, อาคารสารสนเทศ" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ห้อง (Room)</label>
+            <input type="text" [(ngModel)]="editForm.room" class="form-control form-control-sm" placeholder="เช่น ห้อง 402" />
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.75rem;">สถานะการใช้งาน</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editStatus" [(ngModel)]="editForm.status" value="ใช้งาน" id="st1">
+              <label class="form-check-label" for="st1" style="font-size: 0.8rem;">ใช้งานปกติ</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editStatus" [(ngModel)]="editForm.status" value="ชำรุด" id="st2">
+              <label class="form-check-label text-warning-emphasis fw-semibold" for="st2" style="font-size: 0.8rem;">ชำรุด</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editStatus" [(ngModel)]="editForm.status" value="จำหน่าย" id="st3">
+              <label class="form-check-label text-danger fw-semibold" for="st3" style="font-size: 0.8rem;">จำหน่าย</label>
+            </div>
+          </div>
+        </div>
+
+        @if (editForm.status === 'จำหน่าย') {
+          <div class="mb-3 p-2 bg-danger-subtle rounded-3 border border-danger-subtle">
+            <label class="form-label text-danger fw-bold" style="font-size: 0.75rem;">เหตุผลในการจำหน่าย</label>
+            <input type="text" [(ngModel)]="editForm.disposedReason" class="form-control form-control-sm" placeholder="เช่น ชำรุดซ่อมไม่คุ้มค่า" />
+          </div>
+        }
+
+        @if (errorMessage) {
+          <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 0.75rem;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ errorMessage }}
+          </div>
+        }
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer bg-light p-2 border-top">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="close()">ยกเลิก</button>
+        <button type="button" class="btn btn-dark btn-sm fw-bold px-3" (click)="saveChanges()">บันทึกการแก้ไขข้อมูล</button>
+      </div>
+
+    </div>
+  </div>
+}

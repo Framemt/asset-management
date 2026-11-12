@@ -1,0 +1,22 @@
+.app-navbar {
+  background-color: #ffffff;
+  border-bottom: 3px solid #f59e0b !important; // สีทองประจำมหาวิทยาลัยรามคำแหง (RU Gold)
+  box-shadow: 0 2px 8px rgba(0, 45, 98, 0.08);
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+  }
+}

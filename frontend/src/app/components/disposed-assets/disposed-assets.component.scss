@@ -1,0 +1,29 @@
+.disposed-table {
+  th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    font-size: 0.825rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .disposed-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.65rem;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    filter: grayscale(80%);
+    opacity: 0.85;
+  }
+}

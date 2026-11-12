@@ -1,0 +1,376 @@
+<div class="space-y-4">
+  
+  <!-- Header & Actions -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <h4 class="fw-bold text-dark mb-0">ทะเบียนบริหารจัดการครุภัณฑ์</h4>
+        @if (authService.isAdmin()) {
+          <span class="badge bg-dark text-white border" style="font-size: 0.75rem;">
+            <i class="bi bi-shield-check me-1"></i> ผู้ดูแลระบบ (ทุกฝ่าย)
+          </span>
+        } @else {
+          <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.75rem;">
+            <i class="bi bi-building me-1"></i> สังกัด: {{ authService.userDepartment() }}
+          </span>
+        }
+      </div>
+      <small class="text-muted">งานพัสดุและสินทรัพย์ดิจิทัล สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง</small>
+    </div>
+
+    <!-- Admin Only Actions (เพิ่มครุภัณฑ์, เบิกครุภัณฑ์) -->
+    @if (authService.isAdmin()) {
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        <button (click)="openAddModal()" type="button" class="btn btn-success btn-sm fw-bold rounded-pill px-3 shadow-sm d-flex align-items-center gap-1">
+          <i class="bi bi-plus-circle"></i>
+          <span>+ เพิ่มครุภัณฑ์</span>
+        </button>
+
+        <a routerLink="/requisition" class="btn btn-primary btn-sm fw-bold rounded-pill px-3 shadow-sm d-flex align-items-center gap-1">
+          <i class="bi bi-arrow-left-right"></i>
+          <span>เบิกครุภัณฑ์</span>
+        </a>
+      </div>
+    }
+  </div>
+
+  <!-- Summary Cards (Interactive Filters) -->
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+      <div 
+        (click)="filterByStatus('all')" 
+        class="card h-100 p-3 border-0 shadow-sm bg-white rounded-3 card-hover"
+        [class.active-card]="selectedStatus() === 'all'"
+        title="คลิกเพื่อแสดงครุภัณฑ์ทั้งหมด">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="text-uppercase text-muted fw-bold" style="font-size: 0.72rem;">ครุภัณฑ์ทั้งหมด</div>
+          <i class="bi bi-boxes fs-4 text-primary"></i>
+        </div>
+        <div class="fs-3 fw-bold text-dark mt-1">{{ totalCount }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">คลิกเพื่อดูทั้งหมด</small>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div 
+        (click)="filterByStatus('ใช้งาน')" 
+        class="card h-100 p-3 border-0 shadow-sm bg-white rounded-3 card-hover"
+        [class.active-card]="selectedStatus() === 'ใช้งาน'"
+        title="คลิกเพื่อกรองเฉพาะรายการที่ใช้งานปกติ">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="text-uppercase text-success fw-bold d-flex align-items-center" style="font-size: 0.72rem;">
+            <span class="live-dot dot-green"></span>
+            <span>ใช้งานปกติ</span>
+          </div>
+          <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+        </div>
+        <div class="fs-3 fw-bold text-success mt-1">{{ inUseCount }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">คลิกเพื่อกรองสถานะ</small>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div 
+        (click)="filterByStatus('ชำรุด')" 
+        class="card h-100 p-3 border-0 shadow-sm bg-white rounded-3 card-hover"
+        [class.active-card]="selectedStatus() === 'ชำรุด'"
+        title="คลิกเพื่อกรองเฉพาะรายการที่ชำรุด">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="text-uppercase text-warning fw-bold d-flex align-items-center" style="font-size: 0.72rem;">
+            <span class="live-dot dot-yellow"></span>
+            <span>ชำรุด / รอซ่อม</span>
+          </div>
+          <i class="bi bi-exclamation-triangle-fill fs-4 text-warning"></i>
+        </div>
+        <div class="fs-3 fw-bold text-warning mt-1">{{ damagedCount }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">คลิกเพื่อกรองสถานะ</small>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div 
+        (click)="filterByStatus('จำหน่าย')" 
+        class="card h-100 p-3 border-0 shadow-sm bg-white rounded-3 card-hover"
+        [class.active-card]="selectedStatus() === 'จำหน่าย'"
+        title="คลิกเพื่อกรองเฉพาะรายการที่จำหน่ายแล้ว">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="text-uppercase text-danger fw-bold" style="font-size: 0.72rem;">จำหน่ายแล้ว</div>
+          <i class="bi bi-archive-fill fs-4 text-danger"></i>
+        </div>
+        <div class="fs-3 fw-bold text-danger mt-1">{{ disposedCount }}</div>
+        <small class="text-muted" style="font-size: 0.72rem;">คลิกเพื่อกรองสถานะ</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters & Search Controls -->
+  <div class="card p-3 mb-3 border-0 shadow-sm bg-white rounded-3">
+    <div class="row g-2 align-items-center">
+      
+      <!-- Search Input with Keyboard Shortcut Indicator -->
+      <div class="col-md-5 col-lg-5">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light text-primary"><i class="bi bi-search"></i></span>
+          <input 
+            id="assetSearchInput"
+            type="text" 
+            [value]="searchKeyword()" 
+            (input)="onSearchInput($event)" 
+            placeholder="ค้นหาชื่อ, ยี่ห้อ, เลขครุภัณฑ์, Serial Number (กด / เพื่อค้นหา)..."
+            class="form-control" />
+          <span class="input-group-text bg-light text-muted border-start-0 d-none d-sm-flex" title="กดปุ่ม / เพื่อโฟกัสค้นหา">
+            <span class="kbd-badge">/</span>
+          </span>
+          @if (searchKeyword()) {
+            <button class="btn btn-outline-secondary" type="button" (click)="searchKeyword.set('')" title="ล้างคำค้นหา">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Department Filter (for Admin) -->
+      @if (authService.isAdmin()) {
+        <div class="col-md-4 col-lg-4">
+          <select [value]="selectedDepartment()" (change)="onDepartmentChange($event)" class="form-select form-select-sm">
+            <option value="all">🏢 ทุกฝ่ายในสถาบันคอมพิวเตอร์ (All Departments)</option>
+            @for (d of departmentList; track d) {
+              <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Status Filter -->
+      <div class="col-md-3 col-lg-2">
+        <select [value]="selectedStatus()" (change)="onStatusChange($event)" class="form-select form-select-sm">
+          <option value="all">🔍 ทุกสถานะการใช้งาน</option>
+          <option value="ใช้งาน">ใช้งานปกติ</option>
+          <option value="ชำรุด">ชำรุด</option>
+          <option value="จำหน่าย">จำหน่ายแล้ว</option>
+        </select>
+      </div>
+
+      <!-- Clear Button -->
+      @if (searchKeyword() || selectedDepartment() !== 'all' || selectedStatus() !== 'all') {
+        <div class="col-auto">
+          <button (click)="clearFilters()" class="btn btn-outline-danger btn-sm py-1 px-2 rounded-pill" style="font-size: 0.75rem;">
+            <i class="bi bi-x-circle me-1"></i>ล้างตัวกรอง
+          </button>
+        </div>
+      }
+
+    </div>
+  </div>
+
+  <!-- Assets Table -->
+  <div class="card border-0 shadow-sm overflow-hidden rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 asset-table">
+        <thead class="table-light text-muted small text-uppercase" style="font-size: 0.75rem;">
+          <tr>
+            <th class="text-center" style="width: 65px;">รูปภาพ</th>
+            <th>รายการครุภัณฑ์ (ยี่ห้อ / รุ่น)</th>
+            <th>เลขทะเบียนครุภัณฑ์</th>
+            <th>Serial Number</th>
+            <th>ผู้ถือครอง (บุคลากร)</th>
+            <th>สถานที่ติดตั้ง / ห้อง</th>
+            <th class="text-center">สถานะ</th>
+            <th class="text-center" style="min-width: 170px;">การจัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (asset of filteredAssets(); track asset.id) {
+            <tr>
+              
+              <!-- 1. รูปภาพ -->
+              <td class="text-center">
+                <img 
+                  [src]="asset.image" 
+                  (error)="onImageError($event)" 
+                  (click)="openPreview(asset, $event)"
+                  [alt]="asset.name" 
+                  class="rounded-2 border shadow-sm table-img-zoom cursor-pointer" 
+                  style="width: 48px; height: 48px; object-fit: cover;" 
+                  title="คลิกเพื่อดูรูปภาพขนาดใหญ่"
+                  role="button" />
+              </td>
+
+              <!-- 2. รายการครุภัณฑ์ (ยี่ห้อ รุ่น) -->
+              <td>
+                <div class="fw-bold text-dark fs-6">{{ asset.name }}</div>
+                <small class="text-muted d-block">
+                  <span class="fw-semibold text-secondary">{{ asset.brand }}</span> • รุ่น {{ asset.model }}
+                </small>
+                @if (authService.isAdmin()) {
+                  <span class="badge bg-light text-dark border mt-1" style="font-size: 0.65rem;">
+                    {{ asset.department }}
+                  </span>
+                }
+              </td>
+
+              <!-- 3. เลขครุภัณฑ์ -->
+              <td class="font-monospace">
+                @if (asset.assetNumber) {
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 fw-semibold" style="font-size: 0.78rem;">
+                    {{ asset.assetNumber }}
+                  </span>
+                } @else {
+                  <span class="badge bg-light text-muted border fst-italic" style="font-size: 0.72rem;">ยังไม่ออกเลข</span>
+                }
+              </td>
+
+              <!-- 4. Serial Number -->
+              <td class="font-monospace fw-semibold text-secondary" style="font-size: 0.85rem;">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <span>{{ asset.serialNumber }}</span>
+                  @if (asset.serialNumber) {
+                    <button 
+                      (click)="copySerialNumber(asset.serialNumber, $event)" 
+                      class="btn btn-sm btn-link p-0 text-muted copy-btn" 
+                      title="คัดลอก Serial Number">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  }
+                </div>
+              </td>
+
+              <!-- 5. ผู้ใช้งาน (ชื่อบุคลากร) -->
+              <td>
+                <div class="fw-semibold text-dark">{{ asset.assignedPersonnelName }}</div>
+              </td>
+
+              <!-- 6. สถานที่, ห้อง -->
+              <td>
+                <div class="fw-semibold text-dark" style="font-size: 0.82rem;">{{ asset.location }}</div>
+                <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-geo-alt me-1"></i>{{ asset.room }}</small>
+              </td>
+
+              <!-- 7. สถานะ -->
+              <td class="text-center">
+                <app-status-badge [status]="asset.status"></app-status-badge>
+              </td>
+
+              <!-- 8. ปุ่มตรวจสอบ & ปุ่มจัดการ (แก้ไข) & ป้ายบาร์โค้ด -->
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  
+                  <!-- ปุ่มตรวจสอบ: อัปเดตสถานะ -->
+                  <button 
+                    (click)="openInspectModal(asset)"
+                    type="button" 
+                    class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1"
+                    title="บันทึกผลการตรวจสอบสภาพครุภัณฑ์">
+                    <i class="bi bi-patch-check"></i>
+                    <span>ตรวจสภาพ</span>
+                  </button>
+
+                  <!-- ปุ่มจัดการ: แก้ไขทั้งหมด -->
+                  <button 
+                    (click)="openEditModal(asset)"
+                    type="button" 
+                    class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                    title="แก้ไขข้อมูลครุภัณฑ์">
+                    <i class="bi bi-pencil"></i>
+                    <span>จัดการ</span>
+                  </button>
+
+                  <!-- ปุ่มลบ (เฉพาะ Admin) -->
+                  @if (authService.isAdmin()) {
+                    <button 
+                      (click)="deleteAsset(asset)"
+                      type="button" 
+                      class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1"
+                      title="ลบครุภัณฑ์ออกจากระบบ">
+                      <i class="bi bi-trash"></i>
+                      <span>ลบ</span>
+                    </button>
+                  }
+
+                </div>
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-5 text-muted">
+                <i class="bi bi-search fs-2 d-block mb-2 text-secondary"></i>
+                <div class="fw-bold">ไม่พบข้อมูลครุภัณฑ์ตามเงื่อนไขที่ค้นหา</div>
+                <small>ลองเปลี่ยนคำค้นหา หรือกดปุ่ม "ล้างตัวกรอง"</small>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Footer / Count -->
+    <div class="p-3 border-top bg-light d-flex align-items-center justify-content-between text-muted" style="font-size: 0.75rem;">
+      <div>แสดงทั้งหมด <strong>{{ filteredAssets().length }}</strong> รายการ จากครุภัณฑ์ในระบบ</div>
+      <div>สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: ตรวจสอบสภาพครุภัณฑ์ -->
+<app-modal-inspect-asset
+  [isOpen]="isInspectModalOpen"
+  [asset]="selectedAsset"
+  (closeEvent)="isInspectModalOpen = false"
+  (closed)="isInspectModalOpen = false"
+  (updatedEvent)="onDataRefreshed()"
+  (statusUpdated)="onDataRefreshed()">
+</app-modal-inspect-asset>
+
+<!-- Modal: แก้ไขข้อมูลครุภัณฑ์ -->
+<app-modal-edit-asset
+  [isOpen]="isEditModalOpen"
+  [asset]="selectedAsset"
+  (closeEvent)="isEditModalOpen = false"
+  (closed)="isEditModalOpen = false"
+  (updatedEvent)="onDataRefreshed()"
+  (assetUpdated)="onDataRefreshed()">
+</app-modal-edit-asset>
+
+<!-- Modal: เพิ่มครุภัณฑ์ใหม่ -->
+<app-modal-add-asset
+  [isOpen]="isAddModalOpen"
+  (closeEvent)="isAddModalOpen = false"
+  (closed)="isAddModalOpen = false"
+  (addedEvent)="onDataRefreshed()"
+  (assetAdded)="onDataRefreshed()">
+</app-modal-add-asset>
+
+<!-- Modal: เบิกจ่ายครุภัณฑ์ -->
+<app-modal-requisition
+  [isOpen]="isRequisitionModalOpen"
+  [asset]="selectedAsset"
+  (closeEvent)="isRequisitionModalOpen = false"
+  (closed)="isRequisitionModalOpen = false"
+  (completedEvent)="onDataRefreshed()"
+  (requisitionDone)="onDataRefreshed()">
+</app-modal-requisition>
+
+<!-- Image Lightbox Modal -->
+@if (previewAsset; as p) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 1060;" (click)="closePreview()">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-navy text-white py-2 px-3 border-0">
+          <h6 class="modal-title fw-bold d-flex align-items-center gap-2 mb-0">
+            <i class="bi bi-image"></i>
+            <span>{{ p.name }}</span>
+          </h6>
+          <button type="button" class="btn-close btn-close-white" (click)="closePreview()"></button>
+        </div>
+        <div class="modal-body p-0 text-center bg-dark position-relative">
+          <img [src]="p.image" (error)="onImageError($event)" [alt]="p.name" class="img-fluid" style="max-height: 70vh; width: 100%; object-fit: contain;" />
+        </div>
+        <div class="modal-footer bg-light py-2 px-3 border-top d-flex justify-content-between align-items-center">
+          <div class="small text-muted font-monospace">
+            S/N: <strong class="text-dark">{{ p.serialNumber }}</strong> | เลขครุภัณฑ์: <strong class="text-dark">{{ p.assetNumber || 'ยังไม่ออกเลข' }}</strong>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" (click)="closePreview()">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,33 @@
+.personnel-table {
+  th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    font-size: 0.825rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .avatar-initial {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #e2e8f0;
+    color: #334155;
+    font-weight: bold;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cbd5e1;
+  }
+}

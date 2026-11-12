@@ -1,0 +1,172 @@
+@if (isOpen) {
+  <div class="modal-backdrop-custom" (click)="close()">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header bg-success text-white p-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-plus-circle fs-5"></i>
+          <div>
+            <h5 class="modal-title fs-6 fw-bold mb-0">เพิ่มครุภัณฑ์ใหม่เข้าสู่ระบบ</h5>
+            <small class="text-white-50" style="font-size: 0.7rem;">ตรวจสอบความซ้ำซ้อนของ Serial Number อัตโนมัติ</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="close()"></button>
+      </div>
+
+      <!-- Scrollable Form Body -->
+      <div class="modal-scrollable-body">
+        
+        <!-- Image Upload Section (User requested: Image Upload) -->
+        <div class="card bg-light border p-3 mb-3 rounded-3 shadow-sm">
+          <label class="form-label fw-bold text-dark d-flex align-items-center justify-content-between mb-2" style="font-size: 0.78rem;">
+            <div class="d-flex align-items-center gap-1">
+              <i class="bi bi-camera-fill text-success"></i>
+              <span>รูปภาพครุภัณฑ์ (อัปโหลดรูปภาพ)</span>
+            </div>
+            @if (uploadedFileName) {
+              <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.65rem;">
+                พร้อมใช้งาน
+              </span>
+            }
+          </label>
+          
+          <div class="d-flex align-items-center gap-3">
+            <div class="position-relative flex-shrink-0">
+              <img [src]="imageUrl || defaultImage" (error)="onImageError($event)" alt="Preview" class="rounded-3 border shadow-sm object-fit-cover bg-white" style="width: 78px; height: 78px;" />
+              @if (imageUrl) {
+                <button type="button" (click)="removeImage()" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 translate-middle p-0 d-flex align-items-center justify-content-center shadow" style="width: 22px; height: 22px;" title="ลบรูปภาพ">
+                  <i class="bi bi-x" style="font-size: 14px;"></i>
+                </button>
+              }
+            </div>
+
+            <div class="flex-grow-1">
+              <!-- Hidden File Input -->
+              <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" class="d-none" />
+              
+              <!-- Upload Button -->
+              <div class="d-flex flex-wrap gap-2 mb-2">
+                <button type="button" class="btn btn-success btn-sm fw-bold px-3 rounded-pill shadow-sm d-flex align-items-center gap-1" (click)="fileInput.click()" [disabled]="isUploading">
+                  @if (isUploading) {
+                    <span class="spinner-border spinner-border-sm"></span>
+                    <span>กำลังประมวลผลรูปภาพ...</span>
+                  } @else {
+                    <i class="bi bi-cloud-arrow-up-fill fs-6"></i>
+                    <span>อัปโหลดรูปภาพจากอุปกรณ์</span>
+                  }
+                </button>
+
+                @if (imageUrl) {
+                  <button type="button" (click)="removeImage()" class="btn btn-outline-secondary btn-sm rounded-pill px-2" style="font-size: 0.72rem;">
+                    <i class="bi bi-trash me-1"></i>คืนค่ารูปตั้งต้น
+                  </button>
+                }
+              </div>
+
+              @if (uploadedFileName) {
+                <div class="text-success small fw-semibold text-truncate mb-1" style="font-size: 0.72rem; max-width: 320px;">
+                  <i class="bi bi-check-circle-fill me-1"></i>ไฟล์: {{ uploadedFileName }}
+                </div>
+              }
+
+              <!-- Preset Quick Selection -->
+              <div class="d-flex align-items-center gap-1 overflow-x-auto text-nowrap" style="font-size: 0.68rem;">
+                <span class="text-muted">หรือเลือกรูปแม่แบบ:</span>
+                <button type="button" (click)="imageUrl = presetImages.pc; uploadedFileName = ''" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" style="font-size: 0.68rem;">🖥️ PC</button>
+                <button type="button" (click)="imageUrl = presetImages.laptop; uploadedFileName = ''" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" style="font-size: 0.68rem;">💻 โน้ตบุ๊ก</button>
+                <button type="button" (click)="imageUrl = presetImages.printer; uploadedFileName = ''" class="btn btn-outline-secondary btn-sm py-0 px-2 rounded-pill" style="font-size: 0.68rem;">🖨️ เครื่องพิมพ์</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.75rem;">รายการครุภัณฑ์ (ชื่อ) <span class="text-danger">*</span></label>
+          <input type="text" [(ngModel)]="name" class="form-control form-control-sm" placeholder="เช่น คอมพิวเตอร์ All-in-One, โปรเจกเตอร์" />
+        </div>
+
+        <!-- Brand & Model -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-5">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ยี่ห้อ (Brand) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="brand" class="form-control form-control-sm" placeholder="เช่น Dell, HP, Lenovo" />
+          </div>
+          <div class="col-md-7">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">รุ่น (Model) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="model" class="form-control form-control-sm" placeholder="เช่น OptiPlex 7020" />
+          </div>
+        </div>
+
+        <!-- Serial Number (Unique Validation) -->
+        <div class="serial-check-box mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="form-label fw-bold mb-0 text-dark" style="font-size: 0.75rem;">
+              Serial Number <span class="text-danger">*</span>
+            </label>
+            @if (serialNumber.trim().length > 0) {
+              @if (isDuplicate) {
+                <span class="badge bg-danger-subtle text-danger" style="font-size: 0.65rem;">
+                  <i class="bi bi-x-circle me-1"></i>Serial number ซ้ำในระบบ
+                </span>
+              } @else {
+                <span class="badge bg-success-subtle text-success" style="font-size: 0.65rem;">
+                  <i class="bi bi-check-circle me-1"></i>Serial number ใช้งานได้
+                </span>
+              }
+            }
+          </div>
+          <input 
+            type="text" 
+            [(ngModel)]="serialNumber" 
+            (ngModelChange)="checkSerial()"
+            class="form-control form-control-sm font-monospace fw-bold" 
+            [class.is-invalid]="isDuplicate"
+            [class.is-valid]="!isDuplicate && serialNumber.trim().length > 0"
+            placeholder="เช่น SN-DELL-99214-NEW" />
+          <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">
+            * ระบบและ Express API จะตรวจสอบความซ้ำซ้อนทันที ไม่ให้ซ้ำกับข้อมูลที่มีในระบบ
+          </small>
+        </div>
+
+        <!-- Initial Department & Location -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ฝ่ายเบื้องต้น</label>
+            <select [(ngModel)]="department" class="form-select form-select-sm">
+              @for (d of departmentList; track d) {
+                <option [value]="d">{{ d }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">สถานที่จัดเก็บแรกรับ</label>
+            <input type="text" [(ngModel)]="location" class="form-control form-control-sm" placeholder="เช่น คลังพัสดุกลาง" />
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 0.75rem;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ errorMessage }}
+          </div>
+        }
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer bg-light p-2 border-top">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="close()">ยกเลิก</button>
+        <button 
+          type="button" 
+          class="btn btn-success btn-sm fw-bold px-3" 
+          [disabled]="isDuplicate || !name.trim() || !brand.trim() || !model.trim() || !serialNumber.trim()"
+          (click)="saveNewAsset()">
+          บันทึกครุภัณฑ์ใหม่
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

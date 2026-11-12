@@ -1,0 +1,180 @@
+<div class="space-y-4">
+  
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <h4 class="fw-bold text-dark mb-0">ครุภัณฑ์ที่จำหน่าย</h4>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="font-size: 0.75rem;">
+          จำหน่ายแล้ว
+        </span>
+      </div>
+      <small class="text-muted">รายการครุภัณฑ์ที่จำหน่าย (แสดงรายละเอียดเหมือนหน้าครุภัณฑ์)</small>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="card p-3 mb-3 border-0 shadow-sm bg-white rounded-3">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light text-primary"><i class="bi bi-search"></i></span>
+          <input 
+            id="disposedSearchInput"
+            type="text" 
+            [value]="searchKeyword()" 
+            (input)="onSearchInput($event)" 
+            placeholder="ค้นหาครุภัณฑ์จำหน่าย, เลขครุภัณฑ์, Serial Number หรือสาเหตุการจำหน่าย... (กด /)"
+            class="form-control" />
+          <span class="input-group-text bg-light text-muted border-start-0 d-none d-sm-flex" title="กดปุ่ม / เพื่อโฟกัสค้นหา">
+            <span class="kbd-badge">/</span>
+          </span>
+          @if (searchKeyword()) {
+            <button class="btn btn-outline-secondary" type="button" (click)="searchKeyword.set('')" title="ล้างคำค้นหา">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          }
+        </div>
+      </div>
+      <div class="col-md-6 text-md-end mt-2 mt-md-0 text-muted small">
+        พบ <strong>{{ filteredDisposedAssets().length }}</strong> รายการที่ตัดจำหน่ายแล้ว
+      </div>
+    </div>
+  </div>
+
+  <!-- Disposed Assets Table (View Only: NO Inspect / Edit Buttons) -->
+  <div class="card border-0 shadow-sm overflow-hidden rounded-3 bg-white">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 disposed-table">
+        <thead class="table-light text-muted small text-uppercase" style="font-size: 0.75rem;">
+          <tr>
+            <th class="text-center" style="width: 65px;">รูปภาพ</th>
+            <th>รายการครุภัณฑ์ (ยี่ห้อ / รุ่น)</th>
+            <th>เลขทะเบียนครุภัณฑ์</th>
+            <th>Serial Number</th>
+            <th>ผู้ถือครองเดิม</th>
+            <th>สถานที่จัดเก็บซาก / ห้อง</th>
+            <th>วันที่อนุมัติจำหน่าย / สาเหตุ</th>
+            <th class="text-center">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (asset of filteredDisposedAssets(); track asset.id) {
+            <tr>
+              
+              <!-- 1. รูปภาพ -->
+              <td class="text-center">
+                <img 
+                  [src]="asset.image" 
+                  (error)="onImageError($event)" 
+                  (click)="openPreview(asset, $event)"
+                  [alt]="asset.name" 
+                  class="rounded-2 border shadow-sm table-img-zoom cursor-pointer" 
+                  style="width: 48px; height: 48px; object-fit: cover;" 
+                  title="คลิกเพื่อดูรูปภาพขนาดใหญ่"
+                  role="button" />
+              </td>
+
+              <!-- 2. รายการครุภัณฑ์ (ชื่อ ยี่ห้อ รุ่น) -->
+              <td>
+                <div class="fw-bold text-dark fs-6">{{ asset.name }}</div>
+                <small class="text-muted d-block">
+                  <span class="fw-semibold">{{ asset.brand }}</span> • รุ่น {{ asset.model }}
+                </small>
+                <span class="badge bg-light text-dark border mt-1" style="font-size: 0.65rem;">ฝ่าย: {{ asset.department }}</span>
+              </td>
+
+              <!-- 3. เลขครุภัณฑ์ -->
+              <td class="font-monospace text-muted" style="font-size: 0.8rem;">
+                {{ asset.assetNumber || 'พณ.ตัดยอด' }}
+              </td>
+
+              <!-- 4. Serial Number -->
+              <td class="font-monospace text-secondary fw-semibold" style="font-size: 0.85rem;">
+                <div class="d-inline-flex align-items-center gap-1">
+                  <span>{{ asset.serialNumber }}</span>
+                  @if (asset.serialNumber) {
+                    <button 
+                      (click)="copySerialNumber(asset.serialNumber, $event)" 
+                      class="btn btn-sm btn-link p-0 text-muted copy-btn" 
+                      title="คัดลอก Serial Number">
+                      <i class="bi bi-clipboard"></i>
+                    </button>
+                  }
+                </div>
+              </td>
+
+              <!-- 5. ผู้ใช้งานเดิม -->
+              <td>
+                <div class="text-muted">{{ asset.assignedPersonnelName }}</div>
+              </td>
+
+              <!-- 6. สถานที่, ห้อง -->
+              <td>
+                <div class="text-dark" style="font-size: 0.82rem;">{{ asset.location }}</div>
+                <small class="text-muted" style="font-size: 0.72rem;"><i class="bi bi-geo-alt me-1"></i>{{ asset.room }}</small>
+              </td>
+
+              <!-- 7. วันที่จำหน่ายและเหตุผล -->
+              <td>
+                <div class="fw-bold text-danger" style="font-size: 0.82rem;">
+                  <i class="bi bi-calendar-x me-1"></i>{{ asset.disposedDate || '2026-05-10' }}
+                </div>
+                <small class="text-muted d-block" style="font-size: 0.72rem;">
+                  {{ asset.disposedReason || 'เสื่อมสภาพตามอายุการใช้งาน ไม่คุ้มค่าซ่อมบำรุง' }}
+                </small>
+              </td>
+
+              <!-- 8. สถานะ (ดูได้อย่างเดียวตามระเบียบ) -->
+              <td class="text-center">
+                <app-status-badge [status]="asset.status"></app-status-badge>
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-5 text-muted">
+                <i class="bi bi-archive fs-1 d-block mb-2 text-secondary"></i>
+                <div class="fw-bold">ไม่มีรายการครุภัณฑ์ที่ตัดจำหน่าย</div>
+                <small>เมื่อมีการเปลี่ยนสถานะครุภัณฑ์เป็น "จำหน่าย" รายการจะถูกบันทึกประวัติไว้ที่หน้านี้โดยอัตโนมัติ</small>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Footer -->
+    <div class="p-3 border-top bg-light d-flex align-items-center justify-content-between text-muted" style="font-size: 0.75rem;">
+      <div>เอกสารจัดเก็บประวัติทะเบียนครุภัณฑ์ตัดจำหน่าย สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง</div>
+      <div>สถานะ: บันทึกข้อมูลถาวร</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Image Lightbox Modal -->
+@if (previewAsset; as p) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); z-index: 1060;" (click)="closePreview()">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-navy text-white py-2 px-3 border-0">
+          <h6 class="modal-title fw-bold d-flex align-items-center gap-2 mb-0">
+            <i class="bi bi-image"></i>
+            <span>{{ p.name }} (ตัดจำหน่าย)</span>
+          </h6>
+          <button type="button" class="btn-close btn-close-white" (click)="closePreview()"></button>
+        </div>
+        <div class="modal-body p-0 text-center bg-dark position-relative">
+          <img [src]="p.image" (error)="onImageError($event)" [alt]="p.name" class="img-fluid" style="max-height: 70vh; width: 100%; object-fit: contain;" />
+        </div>
+        <div class="modal-footer bg-light py-2 px-3 border-top d-flex justify-content-between align-items-center">
+          <div class="small text-muted font-monospace">
+            S/N: <strong class="text-dark">{{ p.serialNumber }}</strong> | เลขครุภัณฑ์: <strong class="text-dark">{{ p.assetNumber || 'พณ.ตัดยอด' }}</strong>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" (click)="closePreview()">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

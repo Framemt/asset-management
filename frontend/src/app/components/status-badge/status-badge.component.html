@@ -1,0 +1,18 @@
+@if (status === 'ใช้งาน') {
+  <span class="status-badge status-active">
+    <span class="dot"></span>
+    ใช้งานปกติ
+  </span>
+} @else if (status === 'ชำรุด') {
+  <span class="status-badge status-damaged">
+    <span class="dot"></span>
+    ชำรุด / รอซ่อม
+  </span>
+} @else if (status === 'จำหน่าย') {
+  <span class="status-badge status-disposed">
+    <span class="dot"></span>
+    จำหน่ายแล้ว
+  </span>
+} @else {
+  <span class="badge bg-secondary">{{ status }}</span>
+}

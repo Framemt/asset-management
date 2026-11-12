@@ -1,0 +1,73 @@
+@if (isOpen) {
+  <div class="modal-backdrop-custom" (click)="close()">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header bg-dark text-white p-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-person-plus fs-5"></i>
+          <div>
+            <h5 class="modal-title fs-6 fw-bold mb-0">{{ isEditMode ? 'แก้ไขข้อมูลบุคลากร' : 'เพิ่มบุคลากรใหม่' }}</h5>
+            <small class="text-white-50" style="font-size: 0.7rem;">{{ isEditMode ? 'แก้ไขรายละเอียดทั้งหมดเพื่อบันทึกใหม่' : 'กรอกรายละเอียดเพื่อเพิ่มเจ้าหน้าที่ในระบบ' }}</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="close()"></button>
+      </div>
+
+      <!-- Form Body -->
+      <div class="modal-body p-4">
+        
+        <!-- Name -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.75rem;">ชื่อ-สกุล <span class="text-danger">*</span></label>
+          <input type="text" [(ngModel)]="name" class="form-control form-control-sm" placeholder="เช่น นายสมเกียรติ มั่นคง" />
+        </div>
+
+        <!-- Position -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.75rem;">ตำแหน่ง <span class="text-danger">*</span></label>
+          <input type="text" [(ngModel)]="position" class="form-control form-control-sm" placeholder="เช่น นักวิชาการคอมพิวเตอร์" />
+        </div>
+
+        <!-- Department -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.75rem;">ฝ่าย (Department) <span class="text-danger">*</span></label>
+          <select [(ngModel)]="department" class="form-select form-select-sm">
+            @for (d of departmentList; track d) {
+              <option [value]="d">{{ d }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Room & Floor -->
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ห้อง (Room) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="room" class="form-control form-control-sm" placeholder="เช่น 402, 301" />
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-bold" style="font-size: 0.75rem;">ชั้น (Floor) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="floor" class="form-control form-control-sm" placeholder="เช่น ชั้น 4, ชั้น 2" />
+          </div>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 0.75rem;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ errorMessage }}
+          </div>
+        }
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer bg-light p-2 border-top">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="close()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary btn-sm fw-bold px-3" (click)="save()">
+          {{ isEditMode ? 'บันทึกการแก้ไข' : 'บันทึกบุคลากรใหม่' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

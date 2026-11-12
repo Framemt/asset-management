@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+// Ramkhamhaeng University Official Color Identity (น้ำเงิน - ทอง)
+$ru-navy: #002d62; // สีน้ำเงินหลัก ม.ราม
+$ru-blue: #0d6efd; 
+$ru-gold: #f59e0b; // สีทองหลัก ม.ราม
+$font-family-base: 'Prompt', 'Inter', system-ui, -apple-system, sans-serif;
+
+$primary-color: #002d62;
+$secondary-color: #64748b;
+$success-color: #16a34a;
+$danger-color: #dc2626;
+$warning-color: #f59e0b;
+$info-color: #0284c7;
+$light-bg: #f8fafc;
+$card-border-color: #e2e8f0;
+
+body {
+  font-family: $font-family-base;
+  background-color: $light-bg;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+// SCSS Custom Mixins
+@mixin custom-card-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 45, 98, 0.05), 0 2px 4px -2px rgba(0, 45, 98, 0.05);
+}
+
+.card {
+  border-color: $card-border-color;
+  border-radius: 1rem;
+  @include custom-card-shadow;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 45, 98, 0.03);
+}
+
+.badge-ru-gold {
+  background-color: #f59e0b !important;
+  color: #1e293b !important;
+  font-weight: 700;
+  border: 1px solid #d97706 !important;
+}
+
+.badge-ru-navy {
+  background-color: #002d62 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==========================================================================
+   Modern UI Polish & Micro-interactions
+   ========================================================================== */
+
+/* Card Hover Lift Effect */
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px -5px rgba(0, 45, 98, 0.1), 0 8px 10px -6px rgba(0, 45, 98, 0.05) !important;
+  }
+  &.active-card {
+    border: 2px solid $ru-navy !important;
+    background: #f0f7ff !important;
+    transform: translateY(-2px);
+  }
+}
+
+/* Live Pulsing Status Dots */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  position: relative;
+  &.dot-green {
+    background-color: #16a34a;
+    box-shadow: 0 0 0 rgba(22, 163, 74, 0.4);
+    animation: pulseGreen 2s infinite;
+  }
+  &.dot-yellow {
+    background-color: #f59e0b;
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
+    animation: pulseYellow 2s infinite;
+  }
+  &.dot-red {
+    background-color: #dc2626;
+  }
+}
+
+@keyframes pulseGreen {
+  0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+  70% { box-shadow: 0 0 0 7px rgba(22, 163, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+@keyframes pulseYellow {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  70% { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* Image Hover Zoom in Table */
+.table-img-zoom {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: scale(1.18);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important;
+    z-index: 5;
+    position: relative;
+  }
+}
+
+/* Copy Icon Hover Effect */
+.copy-btn {
+  opacity: 0.5;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    color: $ru-navy !important;
+  }
+}
+
+/* Smooth Table Row */
+.table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+/* Keyboard Shortcut Badge */
+.kbd-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  color: #64748b;
+  font-family: monospace;
+}
+
+.btn-navy {
+  background-color: #002d62 !important;
+  color: #ffffff !important;
+  border-color: #002d62 !important;
+  &:hover {
+    background-color: #001f44 !important;
+    color: #ffffff !important;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Official Print Stylesheet for Reports & Tags */
+@media print {
+  app-navbar, app-sidebar, .btn, .input-group, .portal-tab-pill, .modal-footer, .alert, .badge {
+    box-shadow: none !important;
+  }
+  app-navbar, app-sidebar, button, .btn, .modal-footer, .input-group {
+    display: none !important;
+  }
+  body, .main-content, .container-fluid {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: #000000 !important;
+  }
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    th, td {
+      border: 1px solid #000000 !important;
+      padding: 6px !important;
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "asset-management-backend",
+  "version": "1.0.0",
+  "description": "Express Node.js REST API with JWT (8h) & MySQL for CIRU Asset Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seed.js"
+  },
+  "keywords": [
+    "express",
+    "nodejs",
+    "jwt",
+    "mysql",
+    "asset-management"
+  ],
+  "author": "CIRU Development Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7"
+  }
+}

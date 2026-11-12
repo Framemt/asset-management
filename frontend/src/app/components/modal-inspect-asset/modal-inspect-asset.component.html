@@ -1,0 +1,98 @@
+@if (isOpen && asset) {
+  <div class="modal-backdrop-custom" (click)="close()">
+    <div class="modal-dialog-custom animate__animated animate__fadeInDown" (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="modal-header bg-primary text-white p-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-patch-check fs-5"></i>
+          <div>
+            <h5 class="modal-title fs-6 fw-bold mb-0">ตรวจสอบสภาพครุภัณฑ์</h5>
+            <small class="text-white-50" style="font-size: 0.7rem;">อัปเดตและบันทึกสถานะการใช้งาน</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="close()"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4">
+        
+        <!-- Asset Preview -->
+        <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3 mb-3 border">
+          <img [src]="asset.image" (error)="onImageError($event)" [alt]="asset.name" class="rounded-2 object-fit-cover" style="width: 55px; height: 55px;" />
+          <div class="overflow-hidden">
+            <div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;">{{ asset.name }}</div>
+            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ asset.brand }} - {{ asset.model }}</small>
+            <small class="font-monospace text-primary fw-bold" style="font-size: 0.75rem;">SN: {{ asset.serialNumber }}</small>
+          </div>
+        </div>
+
+        <!-- Status Radio Selection -->
+        <div class="mb-3">
+          <label class="form-label fw-bold" style="font-size: 0.8rem;">เลือกสถานะใหม่ <span class="text-danger">*</span></label>
+          <div class="row g-2">
+            
+            <div class="col-4">
+              <div 
+                (click)="selectedStatus = 'ใช้งาน'"
+                class="status-radio-card"
+                [class.selected]="selectedStatus === 'ใช้งาน'">
+                <div class="fs-4 mb-1">✅</div>
+                <div style="font-size: 0.75rem;">ใช้งาน</div>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div 
+                (click)="selectedStatus = 'ชำรุด'"
+                class="status-radio-card"
+                [class.selected]="selectedStatus === 'ชำรุด'">
+                <div class="fs-4 mb-1">⚠️</div>
+                <div style="font-size: 0.75rem;">ชำรุด</div>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div 
+                (click)="selectedStatus = 'จำหน่าย'"
+                class="status-radio-card"
+                [class.selected]="selectedStatus === 'จำหน่าย'">
+                <div class="fs-4 mb-1">🏷️</div>
+                <div style="font-size: 0.75rem;">จำหน่าย</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        @if (selectedStatus === 'จำหน่าย') {
+          <div class="mb-3 p-2 bg-danger-subtle rounded-3 border border-danger-subtle">
+            <label class="form-label text-danger fw-bold" style="font-size: 0.75rem;">เหตุผลในการจำหน่าย <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="disposedReason" class="form-control form-control-sm" placeholder="เช่น เสื่อมสภาพตามอายุการใช้งาน ชิ้นส่วนไม่มีอะไหล่" />
+          </div>
+        }
+
+        <!-- Notes -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" style="font-size: 0.75rem;">หมายเหตุการตรวจสอบ (บันทึกสภาพ)</label>
+          <textarea [(ngModel)]="inspectionNotes" class="form-control form-control-sm" rows="2" placeholder="ระบุข้อสังเกต เช่น อุปกรณ์ตรวจเช็คประจำงวดแล้วปกติ"></textarea>
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger py-2 px-3 mb-0" style="font-size: 0.75rem;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            {{ errorMessage }}
+          </div>
+        }
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer bg-light p-2 border-top">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="close()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary btn-sm fw-bold px-3" (click)="saveInspection()">บันทึกผลการตรวจสอบ</button>
+      </div>
+
+    </div>
+  </div>
+}

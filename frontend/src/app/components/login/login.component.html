@@ -1,0 +1,159 @@
+<div class="login-wrapper min-vh-100 d-flex flex-column justify-content-between">
+  
+  <!-- Top Header Bar -->
+  <header class="top-institution-bar py-2 px-3 px-md-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+        <i class="bi bi-shield-check me-1"></i>ระบบสารสนเทศภายใน (MIS)
+      </span>
+      <span class="text-secondary d-none d-sm-inline" style="font-size: 0.8rem;">สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง</span>
+    </div>
+    <div class="d-flex align-items-center" style="font-size: 0.78rem;">
+      <span class="text-muted"><i class="bi bi-lock-fill text-success me-1"></i>การเชื่อมต่อปลอดภัย (SSL/TLS)</span>
+    </div>
+  </header>
+
+  <!-- Main Login Section -->
+  <main class="flex-grow-1 d-flex align-items-center justify-content-center p-3 p-md-4">
+    <div class="w-100" style="max-width: 440px;">
+
+      <!-- Official Institution Card -->
+      <div class="card border-0 shadow-sm auth-card">
+        
+        <!-- Top Accent Line -->
+        <div class="card-top-accent"></div>
+
+        <div class="card-body p-4 p-md-5">
+
+          <!-- Official Crest & Branding -->
+          <div class="text-center mb-4">
+            <div class="logo-container d-inline-flex align-items-center justify-content-center mb-3">
+              <img 
+                src="ru-logo.png" 
+                alt="ตราสัญลักษณ์ มหาวิทยาลัยรามคำแหง" 
+                class="university-logo" 
+              />
+            </div>
+            
+            <h1 class="h5 fw-bold text-navy mb-1" style="letter-spacing: -0.2px;">ระบบบริหารจัดการครุภัณฑ์</h1>
+            <p class="text-secondary mb-2" style="font-size: 0.88rem;">สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง</p>
+            <div class="d-inline-flex align-items-center gap-1 bg-light border px-3 py-1 rounded-pill small text-secondary mt-1 mb-1" style="font-size: 0.74rem;">
+              <span class="live-dot dot-green" style="width: 6px; height: 6px;"></span>
+              <span>{{ greeting }} • ระบบพร้อมให้บริการ</span>
+            </div>
+            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">CIRU Digital Asset Management System</small>
+          </div>
+
+          <!-- Login Form -->
+          <form (submit)="onSubmit($event)" novalidate>
+            
+            <!-- Username Input -->
+            <div class="mb-3">
+              <label for="usernameInput" class="form-label fw-semibold text-dark mb-1" style="font-size: 0.84rem;">
+                ชื่อผู้ใช้งาน (Username) <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-white text-secondary border-end-0">
+                  <i class="bi bi-person"></i>
+                </span>
+                <input 
+                  id="usernameInput"
+                  type="text" 
+                  name="username" 
+                  [(ngModel)]="username" 
+                  required 
+                  class="form-control border-start-0 ps-0" 
+                  placeholder="ระบุชื่อผู้ใช้งาน" 
+                  autocomplete="username"
+                />
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-3">
+              <label for="passwordInput" class="form-label fw-semibold text-dark mb-1" style="font-size: 0.84rem;">
+                รหัสผ่าน (Password) <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-white text-secondary border-end-0">
+                  <i class="bi bi-key"></i>
+                </span>
+                <input 
+                  id="passwordInput"
+                  [type]="showPassword ? 'text' : 'password'" 
+                  name="password" 
+                  [(ngModel)]="password" 
+                  (keydown)="checkCapsLock($event)"
+                  (keyup)="checkCapsLock($event)"
+                  required 
+                  class="form-control border-start-0 border-end-0 ps-0" 
+                  placeholder="ระบุรหัสผ่าน" 
+                  autocomplete="current-password"
+                />
+                <button 
+                  type="button" 
+                  class="btn btn-outline-secondary border-start-0 bg-white text-secondary" 
+                  (click)="togglePasswordVisibility()"
+                  [title]="showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'">
+                  <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                </button>
+              </div>
+
+              <!-- Caps Lock Active Warning -->
+              @if (isCapsLockOn) {
+                <div class="d-flex align-items-center gap-1 text-warning-emphasis small mt-1 py-1 px-2 bg-warning-subtle rounded border border-warning-subtle" style="font-size: 0.75rem;">
+                  <i class="bi bi-capslock-fill text-warning"></i>
+                  <span>Caps Lock กำลังเปิดอยู่ โปรดระวังพิมพ์ตัวพิมพ์ใหญ่</span>
+                </div>
+              }
+            </div>
+
+            <!-- Error Message Alert -->
+            @if (errorMessage) {
+              <div class="alert alert-danger py-2 px-3 mb-3 d-flex align-items-start gap-2 border-0 shadow-sm" style="font-size: 0.82rem; background-color: #fef2f2; border-left: 4px solid #ef4444 !important;">
+                <i class="bi bi-exclamation-triangle-fill text-danger flex-shrink-0 mt-1"></i>
+                <div class="text-danger-emphasis">{{ errorMessage }}</div>
+              </div>
+            }
+
+            <!-- Submit Button -->
+            <button 
+              type="submit" 
+              class="btn btn-navy w-100 py-2 fw-semibold shadow-sm mt-3 d-flex align-items-center justify-content-center gap-2" 
+              [disabled]="isLoading">
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm"></span>
+                <span>กำลังเข้าสู่ระบบ...</span>
+              } @else {
+                <i class="bi bi-box-arrow-in-right fs-5"></i>
+                <span>เข้าสู่ระบบ (Sign In)</span>
+              }
+            </button>
+          </form>
+
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer bg-light border-top px-4 py-2 text-center text-muted" style="font-size: 0.75rem;">
+          <span>สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง</span>
+        </div>
+
+      </div>
+
+      <!-- Support Notice -->
+      <div class="text-center text-secondary mt-3" style="font-size: 0.75rem; line-height: 1.5;">
+        <span>สำหรับบุคลากรสถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหงเท่านั้น</span><br />
+        <span>หากพบปัญหาการเข้าสู่ระบบ โปรดติดต่อฝ่ายพัฒนาระบบสารสนเทศ โทร. 02-310-8800</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Bottom Footer -->
+  <footer class="bottom-institution-footer py-2 px-3 text-center border-top">
+    <small class="text-secondary" style="font-size: 0.74rem;">
+      © 2026 สถาบันคอมพิวเตอร์ มหาวิทยาลัยรามคำแหง (Computer Institute, Ramkhamhaeng University) | สงวนลิขสิทธิ์
+    </small>
+  </footer>
+
+</div>
